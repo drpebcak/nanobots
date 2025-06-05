@@ -11,7 +11,7 @@ import logging
 from pathlib import Path
 from typing import Optional, Dict, Any, List
 from io import BytesIO
-
+from typing import Annotated
 import httpx
 from PIL import Image
 from openai import AsyncOpenAI
@@ -34,16 +34,8 @@ openai_client = AsyncOpenAI(
     api_key=os.getenv("OPENAI_API_KEY")
 )
 
-def encode_image_to_base64(image_path: str) -> str:
-    """
-    Encode an image file to base64 string.
-    
-    Args:
-        image_path: Path to the image file
-        
-    Returns:
-        Base64 encoded string of the image
-    """
+def encode_image_to_base64(image_path: Annotated[str, "Path to the image file"]) -> str:
+    """Encode an image file to base64 string."""
     try:
         with open(image_path, "rb") as image_file:
             encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
@@ -52,16 +44,8 @@ def encode_image_to_base64(image_path: str) -> str:
         logger.error(f"Error encoding image: {e}")
         raise
 
-def get_image_mime_type(image_path: str) -> str:
-    """
-    Get MIME type of an image file.
-    
-    Args:
-        image_path: Path to the image file
-        
-    Returns:
-        MIME type string
-    """
+def get_image_mime_type(image_path: Annotated[str, "Path to the image file"]) -> str:
+    """Get MIME type of an image file."""
     try:
         with Image.open(image_path) as img:
             format_to_mime = {
@@ -78,23 +62,12 @@ def get_image_mime_type(image_path: str) -> str:
 
 @mcp.tool()
 async def describe_image(
-    image_path: str,
-    prompt: Optional[str] = None,
-    max_tokens: int = 300,
-    detail: str = "auto"
+    image_path: Annotated[str, "Path to the image file to analyze"],
+    prompt: Annotated[str, "Optional custom prompt for the description"] = None,
+    max_tokens: Annotated[int, "Maximum number of tokens in the response"] = 300,
+    detail: Annotated[str, "Level of detail for image analysis"] = "auto"
 ) -> Dict[str, Any]:
-    """
-    Upload an image to OpenAI and get a description.
-    
-    Args:
-        image_path: Path to the image file to analyze
-        prompt: Optional custom prompt for the description (defaults to "Describe this image in detail")
-        max_tokens: Maximum number of tokens in the response (default: 300)
-        detail: Level of detail for image analysis ("low", "high", or "auto")
-        
-    Returns:
-        Dictionary containing the image description and metadata
-    """
+    """Upload an image to OpenAI and get a description."""
     try:
         # Check if file exists
         if not os.path.exists(image_path):
@@ -145,10 +118,10 @@ async def describe_image(
         # Make request to OpenAI
         logger.info(f"Sending image to OpenAI for description: {image_path}")
         response = await openai_client.chat.completions.create(
-            model="gpt-4o",  # Using GPT-4 with vision capabilities
+            model="gpt-4.1",
             messages=messages,
             max_tokens=max_tokens,
-            temperature=0.7
+            temperature=1
         )
         
         # Extract the description
@@ -177,23 +150,12 @@ async def describe_image(
 
 @mcp.tool()
 async def batch_describe_images(
-    image_paths: List[str],
-    prompt: Optional[str] = None,
-    max_tokens: int = 300,
-    detail: str = "auto"
+    image_paths: Annotated[List[str], "List of paths to image files"],
+    prompt: Annotated[str, "Optional custom prompt for descriptions"] = None,
+    max_tokens: Annotated[int, "Maximum number of tokens per response"] = 300,
+    detail: Annotated[str, "Level of detail for image analysis"] = "auto"
 ) -> Dict[str, Any]:
-    """
-    Describe multiple images in batch.
-    
-    Args:
-        image_paths: List of paths to image files
-        prompt: Optional custom prompt for descriptions
-        max_tokens: Maximum number of tokens per response
-        detail: Level of detail for image analysis
-        
-    Returns:
-        Dictionary containing results for all images
-    """
+    """Describe multiple images in batch."""
     results = []
     
     for image_path in image_paths:
@@ -208,23 +170,12 @@ async def batch_describe_images(
 
 @mcp.tool()
 async def compare_images(
-    image_path1: str,
-    image_path2: str,
-    comparison_prompt: Optional[str] = None,
-    max_tokens: int = 400
+    image_path1: Annotated[str, "Path to the first image"],
+    image_path2: Annotated[str, "Path to the second image"],
+    comparison_prompt: Annotated[str, "Prompt for the comparison"] = None,
+    max_tokens: Annotated[int, "Maximum number of tokens in the response"] = 400
 ) -> Dict[str, Any]:
-    """
-    Compare two images and describe their differences and similarities.
-    
-    Args:
-        image_path1: Path to the first image
-        image_path2: Path to the second image
-        comparison_prompt: Optional custom prompt for comparison
-        max_tokens: Maximum number of tokens in the response
-        
-    Returns:
-        Dictionary containing the comparison results
-    """
+    """Compare two images and describe their differences and similarities."""
     try:
         # Check if both files exist
         for path in [image_path1, image_path2]:
@@ -275,7 +226,7 @@ async def compare_images(
         # Make request to OpenAI
         logger.info(f"Comparing images: {image_path1} vs {image_path2}")
         response = await openai_client.chat.completions.create(
-            model="gpt-4o",
+            model="gpt-4.1",
             messages=messages,
             max_tokens=max_tokens,
             temperature=0.7
@@ -301,21 +252,7 @@ async def compare_images(
 
 def serve():
     """Main entry point for the Vision MCP Server."""
-    # Check for OpenAI API key
-    # if not os.getenv("OPENAI_API_KEY"):
-    #     logger.error("OPENAI_API_KEY environment variable is not set!")
-    #     logger.info("Please set your OpenAI API key in the environment or .env file")
-    #     exit(1)
-    
-    # logger.info("Starting Vision MCP Server...")
-    # logger.info("Available tools:")
-    # logger.info("  - describe_image: Get detailed descriptions of images")
-    # logger.info("  - batch_describe_images: Describe multiple images at once")
-    # logger.info("  - compare_images: Compare two images and describe differences")
-
-    
-    # Run the MCP server
     mcp.run()
 
 if __name__ == "__main__":
-    main() 
+    serve()
