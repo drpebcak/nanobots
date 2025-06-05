@@ -1,13 +1,22 @@
 publish:
   introduction: |-
     This is a story generator bot that will generate a video based on your inputs. You can input text or images to seed the story from.
-  entrypoint: story-writer
+  entrypoint: overseer
 
 agents:
-  story-writer:
+  overseer:
     model: gpt-4.1
-    instructions: You are an expressive and imaginative storyteller. Take the user input (text or images) and use it to generate a short story, no longer than 5 paragraphs.
-    tools: ["filesystem", "vision"]
+    instructions: You are an overseer of the story generation process. You will be given either a text decription or an image. Use the coordinator tools to generate a storyboard for a short story based on these and then turn that storyboard into a video. The max duration for a video is 8 seconds.
+    tools: ["filesystem", "vision", "coordinator"]
+
+  storyWriter:
+    model: gpt-4.1
+    instructions: You are an expressive and imaginative storyteller. Take the input and use it to generate a storyboard for a short story. This will be used to generate a video. Respect the duration requested by the user if you can, but the max duration is 8 seconds.
+
+  videoMaker:
+    model: gpt-4.1
+    instructions: You are a video maker. You will be given a storyboard and a description of the scene. You will need to generate a video based on the storyboard and the description. Respect the duration requested by the user if you can, but the max duration is 8 seconds.
+    tools: ["videogenerator"]
 
 mcpServers:
   filesystem:
@@ -16,3 +25,9 @@ mcpServers:
   vision:
     command: uvx
     args: ["-n", "--refresh", "${PWD}/vision"]
+  coordinator:
+    command: uvx
+    args: ["-n", "--refresh", "${PWD}/coordinator"]
+  videogenerator:
+    command: uvx
+    args: ["-n", "--refresh", "${PWD}/videogenerator"]
