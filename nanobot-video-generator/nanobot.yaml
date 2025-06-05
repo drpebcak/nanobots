@@ -12,7 +12,7 @@ agents:
 mcpServers:
   filesystem:
     command: npx
-    args: ["-y", "@modelcontextprotocol/server-filesystem", "/home/tprice/code/scratch/nanobots/nanobot-video-generator"]
+    args: ["-y", "@modelcontextprotocol/server-filesystem", "${PWD}"]
   vision:
     command: uvx
-    args: ["-n", "--refresh", "/home/tprice/code/scratch/nanobots/nanobot-video-generator/vision"]
+    args: ["-n", "--refresh", "${PWD}/vision"]

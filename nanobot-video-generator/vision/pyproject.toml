@@ -2,7 +2,6 @@
 name = "mcp-server-vision"
 version = "0.0.1"
 description = "A Model Context Protocol server providing tools to analyze images"
-readme = "README.md"
 requires-python = ">=3.13"
 authors = [{ name = "drpebcak" }]
 keywords = ["http", "mcp", "llm", "automation"]
