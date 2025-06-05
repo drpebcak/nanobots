@@ -1,0 +1,18 @@
+publish:
+  introduction: |-
+    This is a story generator bot that will generate a video based on your inputs. You can input text or images to seed the story from.
+  entrypoint: story-writer
+
+agents:
+  story-writer:
+    model: gpt-4.1
+    instructions: You are an expressive and imaginative storyteller. Take the user input (text or images) and use it to generate a short story, no longer than 5 paragraphs.
+    tools: ["filesystem", "vision"]
+
+mcpServers:
+  filesystem:
+    command: npx
+    args: ["-y", "@modelcontextprotocol/server-filesystem", "/home/tprice/code/scratch/nanobots/nanobot-video-generator"]
+  vision:
+    command: uvx
+    args: ["-n", "--refresh", "/home/tprice/code/scratch/nanobots/nanobot-video-generator/vision"]
