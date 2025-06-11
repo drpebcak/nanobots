@@ -1,6 +1,6 @@
 [project]
 name = "mcp-server-videogenerator"
-version = "0.0.1"
+version = "0.0.3"
 description = "A Model Context Protocol server providing tools to generate videos"
 requires-python = ">=3.13"
 authors = [{ name = "drpebcak" }]
@@ -16,6 +16,7 @@ classifiers = [
 dependencies = [
     "fastmcp>=2.6.1",
     "google-genai>=1.19.0",
+    "google-auth",
     "pillow>=11.2.1",
     "python-dotenv>=1.1.0",
     "httpx>=0.28.1",

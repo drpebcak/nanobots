@@ -4,6 +4,7 @@ import logging
 import sys
 from .videogenerator_server import serve
 
+
 @click.command()
 @click.option("-v", "--verbose", count=True)
 def main(verbose: bool) -> None:
@@ -18,6 +19,7 @@ def main(verbose: bool) -> None:
 
     logging.basicConfig(level=logging_level, stream=sys.stderr)
     asyncio.run(serve())
+
 
 if __name__ == "__main__":
     main()
